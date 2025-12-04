@@ -26,11 +26,20 @@ export default function Sidebar() {
                 <Link
                     href="/account"
                     className={`group flex items-center rounded-md px-2 py-2 text-lg font-medium ${isActive('/account')
-                            ? 'bg-gray-100 text-gray-900'
-                            : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                        ? 'bg-gray-100 text-gray-900'
+                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                         }`}
                 >
                     Account
+                </Link>
+                <Link
+                    href="/notes"
+                    className={`group flex items-center rounded-md px-2 py-2 text-lg font-medium ${isActive('/notes')
+                        ? 'bg-gray-100 text-gray-900'
+                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                        }`}
+                >
+                    Notes
                 </Link>
             </nav>
 
