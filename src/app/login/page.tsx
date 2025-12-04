@@ -12,6 +12,7 @@ import {
     Box,
 } from '@mui/material'
 import GoogleIcon from '@mui/icons-material/Google'
+import { generateNickname } from '@/utils/nickname'
 
 export default function LoginPage() {
     const [loading, setLoading] = useState(false)
@@ -20,7 +21,10 @@ export default function LoginPage() {
 
     const handleLogin = async () => {
         setLoading(true)
-        // Temporary bypass
+        // Generate a random nickname and set it in a cookie
+        const nickname = generateNickname()
+        document.cookie = `username=${nickname}; path=/; max-age=31536000` // Valid for 1 year
+
         router.push('/account')
     }
 

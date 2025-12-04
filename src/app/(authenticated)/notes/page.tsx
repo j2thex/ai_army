@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react'
 type Note = {
     id: string
     content: string
+    author_username?: string
     created_at: string
     updated_at: string
 }

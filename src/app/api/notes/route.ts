@@ -1,5 +1,6 @@
 import { createClient } from '@/utils/supabase/server'
 import { NextResponse } from 'next/server'
+import { cookies } from 'next/headers'
 
 export async function GET() {
     const supabase = await createClient()
@@ -24,9 +25,13 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'Content is required' }, { status: 400 })
     }
 
+    // Get the username from the cookie
+    const cookieStore = await cookies()
+    const username = cookieStore.get('username')?.value || 'Unknown'
+
     const { data: note, error } = await supabase
         .from('notes')
-        .insert({ content })
+        .insert({ content, author_username: username })
         .select()
         .single()
 

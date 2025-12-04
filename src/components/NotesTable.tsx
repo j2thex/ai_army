@@ -27,6 +27,7 @@ import {
 type Note = {
     id: string
     content: string
+    author_username?: string
     created_at: string
     updated_at: string
 }
@@ -143,6 +144,7 @@ export default function NotesTable({ initialNotes }: { initialNotes: Note[] }) {
                         <TableRow>
                             <TableCell sx={{ fontWeight: 600, width: '15%' }}>Date</TableCell>
                             <TableCell sx={{ fontWeight: 600 }}>Content</TableCell>
+                            <TableCell sx={{ fontWeight: 600, width: '15%' }}>Author</TableCell>
                             <TableCell sx={{ width: 64 }}></TableCell>
                         </TableRow>
                     </TableHead>
@@ -178,6 +180,11 @@ export default function NotesTable({ initialNotes }: { initialNotes: Note[] }) {
                                     ) : (
                                         note.content
                                     )}
+                                </TableCell>
+                                <TableCell>
+                                    <Typography variant="body2" color="text.secondary">
+                                        {note.author_username || 'Unknown'}
+                                    </Typography>
                                 </TableCell>
                                 <TableCell align="center">
                                     <IconButton
@@ -226,6 +233,7 @@ export default function NotesTable({ initialNotes }: { initialNotes: Note[] }) {
                                         </Button>
                                     </Stack>
                                 </TableCell>
+                                <TableCell></TableCell>
                                 <TableCell></TableCell>
                             </TableRow>
                         )}
