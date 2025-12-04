@@ -19,7 +19,7 @@ export async function GET() {
 
 export async function POST(request: Request) {
     const supabase = await createClient()
-    const { content } = await request.json()
+    const { content, categories } = await request.json()
 
     if (!content) {
         return NextResponse.json({ error: 'Content is required' }, { status: 400 })
@@ -31,7 +31,11 @@ export async function POST(request: Request) {
 
     const { data: note, error } = await supabase
         .from('notes')
-        .insert({ content, author_username: username })
+        .insert({
+            content,
+            author_username: username,
+            categories: categories || []
+        })
         .select()
         .single()
 

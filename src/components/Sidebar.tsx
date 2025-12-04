@@ -33,6 +33,7 @@ export default function Sidebar() {
     const menuItems = [
         { text: 'Account', path: '/account', icon: <AccountIcon /> },
         { text: 'Notes', path: '/notes', icon: <NoteIcon /> },
+        { text: 'Mindmap', path: '/mindmap', icon: <NoteIcon /> }, // Reusing NoteIcon for now
     ]
 
     return (

@@ -7,7 +7,7 @@ export async function PUT(
 ) {
     const supabase = await createClient()
     const { id } = await params
-    const { content } = await request.json()
+    const { content, categories } = await request.json()
 
     if (!content) {
         return NextResponse.json({ error: 'Content is required' }, { status: 400 })
@@ -15,7 +15,11 @@ export async function PUT(
 
     const { data: note, error } = await supabase
         .from('notes')
-        .update({ content, updated_at: new Date().toISOString() })
+        .update({
+            content,
+            categories: categories || [],
+            updated_at: new Date().toISOString()
+        })
         .eq('id', id)
         .select()
         .single()

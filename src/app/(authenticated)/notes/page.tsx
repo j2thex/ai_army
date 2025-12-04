@@ -7,6 +7,7 @@ type Note = {
     id: string
     content: string
     author_username?: string
+    categories: string[]
     created_at: string
     updated_at: string
 }

@@ -22,12 +22,15 @@ import {
 import {
     MoreVert as MoreVertIcon,
     Add as AddIcon,
+    Close as CloseIcon,
 } from '@mui/icons-material'
+import { Chip } from '@mui/material'
 
 type Note = {
     id: string
     content: string
     author_username?: string
+    categories: string[]
     created_at: string
     updated_at: string
 }
@@ -37,6 +40,8 @@ export default function NotesTable({ initialNotes }: { initialNotes: Note[] }) {
     const [isCreating, setIsCreating] = useState(false)
     const [editingId, setEditingId] = useState<string | null>(null)
     const [content, setContent] = useState('')
+    const [categories, setCategories] = useState<string[]>([])
+    const [newCategory, setNewCategory] = useState('')
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
     const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null)
     const router = useRouter()
@@ -58,13 +63,14 @@ export default function NotesTable({ initialNotes }: { initialNotes: Note[] }) {
             const res = await fetch('/api/notes', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ content }),
+                body: JSON.stringify({ content, categories }),
             })
 
             if (res.ok) {
                 const newNote = await res.json()
                 setNotes([newNote, ...notes])
                 setContent('')
+                setCategories([])
                 setIsCreating(false)
                 router.refresh()
             }
@@ -80,7 +86,7 @@ export default function NotesTable({ initialNotes }: { initialNotes: Note[] }) {
             const res = await fetch(`/api/notes/${id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ content }),
+                body: JSON.stringify({ content, categories }),
             })
 
             if (res.ok) {
@@ -88,6 +94,7 @@ export default function NotesTable({ initialNotes }: { initialNotes: Note[] }) {
                 setNotes(notes.map((n) => (n.id === id ? updatedNote : n)))
                 setEditingId(null)
                 setContent('')
+                setCategories([])
                 router.refresh()
             }
         } catch (error) {
@@ -116,12 +123,14 @@ export default function NotesTable({ initialNotes }: { initialNotes: Note[] }) {
     const startEdit = (note: Note) => {
         setEditingId(note.id)
         setContent(note.content)
+        setCategories(note.categories || [])
         handleMenuClose()
     }
 
     const cancelEdit = () => {
         setEditingId(null)
         setContent('')
+        setCategories([])
     }
 
     const formatDate = (dateString: string) => {
@@ -144,6 +153,7 @@ export default function NotesTable({ initialNotes }: { initialNotes: Note[] }) {
                         <TableRow>
                             <TableCell sx={{ fontWeight: 600, width: '15%' }}>Date</TableCell>
                             <TableCell sx={{ fontWeight: 600 }}>Content</TableCell>
+                            <TableCell sx={{ fontWeight: 600, width: '25%' }}>Categories</TableCell>
                             <TableCell sx={{ fontWeight: 600, width: '15%' }}>Author</TableCell>
                             <TableCell sx={{ width: 64 }}></TableCell>
                         </TableRow>
@@ -179,6 +189,59 @@ export default function NotesTable({ initialNotes }: { initialNotes: Note[] }) {
                                         </Stack>
                                     ) : (
                                         note.content
+                                    )}
+                                </TableCell>
+                                <TableCell>
+                                    {editingId === note.id ? (
+                                        <Stack spacing={1}>
+                                            <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                                                {categories.map((cat) => (
+                                                    <Chip
+                                                        key={cat}
+                                                        label={cat}
+                                                        onDelete={() => setCategories(categories.filter((c) => c !== cat))}
+                                                        size="small"
+                                                    />
+                                                ))}
+                                            </Stack>
+                                            <Stack direction="row" spacing={1}>
+                                                <TextField
+                                                    value={newCategory}
+                                                    onChange={(e) => setNewCategory(e.target.value)}
+                                                    placeholder="Add category"
+                                                    size="small"
+                                                    onKeyDown={(e) => {
+                                                        if (e.key === 'Enter' && newCategory.trim()) {
+                                                            e.preventDefault()
+                                                            if (!categories.includes(newCategory.trim())) {
+                                                                setCategories([...categories, newCategory.trim()])
+                                                            }
+                                                            setNewCategory('')
+                                                        }
+                                                    }}
+                                                />
+                                                <Button
+                                                    variant="outlined"
+                                                    size="small"
+                                                    onClick={() => {
+                                                        if (newCategory.trim()) {
+                                                            if (!categories.includes(newCategory.trim())) {
+                                                                setCategories([...categories, newCategory.trim()])
+                                                            }
+                                                            setNewCategory('')
+                                                        }
+                                                    }}
+                                                >
+                                                    Add
+                                                </Button>
+                                            </Stack>
+                                        </Stack>
+                                    ) : (
+                                        <Stack direction="row" spacing={0.5} flexWrap="wrap" useFlexGap>
+                                            {(note.categories || []).map((cat) => (
+                                                <Chip key={cat} label={cat} size="small" variant="outlined" />
+                                            ))}
+                                        </Stack>
                                     )}
                                 </TableCell>
                                 <TableCell>
@@ -227,13 +290,58 @@ export default function NotesTable({ initialNotes }: { initialNotes: Note[] }) {
                                             onClick={() => {
                                                 setIsCreating(false)
                                                 setContent('')
+                                                setCategories([])
                                             }}
                                         >
                                             Cancel
                                         </Button>
                                     </Stack>
                                 </TableCell>
-                                <TableCell></TableCell>
+                                <TableCell>
+                                    <Stack spacing={1}>
+                                        <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                                            {categories.map((cat) => (
+                                                <Chip
+                                                    key={cat}
+                                                    label={cat}
+                                                    onDelete={() => setCategories(categories.filter((c) => c !== cat))}
+                                                    size="small"
+                                                />
+                                            ))}
+                                        </Stack>
+                                        <Stack direction="row" spacing={1}>
+                                            <TextField
+                                                value={newCategory}
+                                                onChange={(e) => setNewCategory(e.target.value)}
+                                                placeholder="Add category"
+                                                size="small"
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter' && newCategory.trim()) {
+                                                        e.preventDefault()
+                                                        if (!categories.includes(newCategory.trim())) {
+                                                            setCategories([...categories, newCategory.trim()])
+                                                        }
+                                                        setNewCategory('')
+                                                    }
+                                                }}
+                                            />
+                                            <Button
+                                                variant="outlined"
+                                                size="small"
+                                                onClick={() => {
+                                                    if (newCategory.trim()) {
+                                                        if (!categories.includes(newCategory.trim())) {
+                                                            setCategories([...categories, newCategory.trim()])
+                                                        }
+                                                        setNewCategory('')
+                                                    }
+                                                }}
+                                            >
+                                                Add
+                                            </Button>
+                                        </Stack>
+                                    </Stack>
+                                </TableCell>
                                 <TableCell></TableCell>
                             </TableRow>
                         )}
