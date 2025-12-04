@@ -1,20 +1,33 @@
-import { createClient } from '@/utils/supabase/server'
+'use client'
+
 import NotesTable from '@/components/NotesTable'
+import { useEffect, useState } from 'react'
 
-export const dynamic = 'force-dynamic'
+type Note = {
+    id: string
+    content: string
+    created_at: string
+    updated_at: string
+}
 
-export default async function NotesPage() {
-    const supabase = await createClient()
+export default function NotesPage() {
+    const [notes, setNotes] = useState<Note[]>([])
+    const [loading, setLoading] = useState(true)
 
-    const { data: notes, error } = await supabase
-        .from('notes')
-        .select('*')
-        .order('created_at', { ascending: false })
+    useEffect(() => {
+        fetch('/api/notes')
+            .then((res) => res.json())
+            .then((data) => {
+                setNotes(data)
+                setLoading(false)
+            })
+            .catch((error) => {
+                console.error('Error fetching notes:', error)
+                setLoading(false)
+            })
+    }, [])
 
-    if (error) {
-        console.error('Error fetching notes:', error)
-        return <div>Error loading notes</div>
-    }
+    if (loading) return <div>Loading...</div>
 
-    return <NotesTable initialNotes={notes || []} />
+    return <NotesTable initialNotes={notes} />
 }

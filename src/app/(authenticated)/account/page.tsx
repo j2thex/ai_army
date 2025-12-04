@@ -1,18 +1,9 @@
-import { createClient } from '@/utils/supabase/server'
+'use client'
+
 import { Box, Typography, Avatar, Paper, Stack } from '@mui/material'
 
-export const dynamic = 'force-dynamic'
-
-export default async function AccountPage() {
-    /*
-    const supabase = await createClient()
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
-  
-    const email = user?.email
-    const avatarUrl = user?.user_metadata?.avatar_url
-    */
+export default function AccountPage() {
+    // Mock data since auth is bypassed
     const email = 'mock@example.com'
     const avatarUrl = null
 
