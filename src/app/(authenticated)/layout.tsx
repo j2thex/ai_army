@@ -1,30 +1,39 @@
 import Sidebar from '@/components/Sidebar'
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
+import { Box } from '@mui/material'
 
 export default async function AuthenticatedLayout({
-    children,
+  children,
 }: {
-    children: React.ReactNode
+  children: React.ReactNode
 }) {
-    /*
-  const supabase = await createClient()
+  /*
+const supabase = await createClient()
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+const {
+  data: { user },
+} = await supabase.auth.getUser()
 
-  if (!user) {
-    redirect('/login')
-  }
-  */
+if (!user) {
+  redirect('/login')
+}
+*/
 
-    return (
-        <div className="flex h-screen bg-gray-50">
-            <Sidebar />
-            <main className="flex-1 overflow-y-auto p-8">
-                {children}
-            </main>
-        </div>
-    )
+  return (
+    <Box sx={{ display: 'flex', height: '100vh' }}>
+      <Sidebar />
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          overflow: 'auto',
+          p: 4,
+          bgcolor: 'background.default',
+        }}
+      >
+        {children}
+      </Box>
+    </Box>
+  )
 }

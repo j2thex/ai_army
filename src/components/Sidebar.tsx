@@ -1,8 +1,24 @@
 'use client'
 
 import { createClient } from '@/utils/supabase/client'
-import Link from 'next/link'
 import { useRouter, usePathname } from 'next/navigation'
+import {
+    Drawer,
+    List,
+    ListItem,
+    ListItemButton,
+    ListItemText,
+    Button,
+    Box,
+    Typography,
+    Divider,
+} from '@mui/material'
+import {
+    AccountCircle as AccountIcon,
+    Note as NoteIcon,
+} from '@mui/icons-material'
+
+const DRAWER_WIDTH = 256
 
 export default function Sidebar() {
     const router = useRouter()
@@ -14,43 +30,87 @@ export default function Sidebar() {
         router.push('/login')
     }
 
-    const isActive = (path: string) => pathname === path
+    const menuItems = [
+        { text: 'Account', path: '/account', icon: <AccountIcon /> },
+        { text: 'Notes', path: '/notes', icon: <NoteIcon /> },
+    ]
 
     return (
-        <div className="flex h-screen w-64 flex-col border-r border-gray-200 bg-white">
-            <div className="flex h-16 items-center justify-center border-b border-gray-200">
-                <h1 className="text-2xl font-semibold text-gray-800">Menu</h1>
-            </div>
+        <Drawer
+            variant="permanent"
+            sx={{
+                width: DRAWER_WIDTH,
+                flexShrink: 0,
+                '& .MuiDrawer-paper': {
+                    width: DRAWER_WIDTH,
+                    boxSizing: 'border-box',
+                },
+            }}
+        >
+            <Box
+                sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    height: '100%',
+                }}
+            >
+                {/* Header */}
+                <Box
+                    sx={{
+                        p: 2,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        borderBottom: 1,
+                        borderColor: 'divider',
+                    }}
+                >
+                    <Typography variant="h5" component="h1" fontWeight={600}>
+                        Menu
+                    </Typography>
+                </Box>
 
-            <nav className="flex-1 space-y-1 px-2 py-4">
-                <Link
-                    href="/account"
-                    className={`group flex items-center rounded-md px-2 py-2 text-lg font-medium ${isActive('/account')
-                        ? 'bg-gray-100 text-gray-900'
-                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                        }`}
-                >
-                    Account
-                </Link>
-                <Link
-                    href="/notes"
-                    className={`group flex items-center rounded-md px-2 py-2 text-lg font-medium ${isActive('/notes')
-                        ? 'bg-gray-100 text-gray-900'
-                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                        }`}
-                >
-                    Notes
-                </Link>
-            </nav>
+                {/* Navigation */}
+                <List sx={{ flex: 1, py: 2 }}>
+                    {menuItems.map((item) => (
+                        <ListItem key={item.path} disablePadding sx={{ px: 1 }}>
+                            <ListItemButton
+                                selected={pathname === item.path}
+                                onClick={() => router.push(item.path)}
+                                sx={{
+                                    borderRadius: 1,
+                                    '&.Mui-selected': {
+                                        backgroundColor: 'action.selected',
+                                    },
+                                }}
+                            >
+                                <Box sx={{ mr: 2, display: 'flex', color: 'action.active' }}>
+                                    {item.icon}
+                                </Box>
+                                <ListItemText
+                                    primary={item.text}
+                                    primaryTypographyProps={{
+                                        fontSize: '1.125rem',
+                                        fontWeight: 500,
+                                    }}
+                                />
+                            </ListItemButton>
+                        </ListItem>
+                    ))}
+                </List>
 
-            <div className="border-t border-gray-200 p-4">
-                <button
-                    onClick={handleLogout}
-                    className="w-full rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                >
-                    Logout
-                </button>
-            </div>
-        </div>
+                {/* Logout Button */}
+                <Box sx={{ p: 2, borderTop: 1, borderColor: 'divider' }}>
+                    <Button
+                        variant="outlined"
+                        fullWidth
+                        onClick={handleLogout}
+                        sx={{ textTransform: 'none' }}
+                    >
+                        Logout
+                    </Button>
+                </Box>
+            </Box>
+        </Drawer>
     )
 }
