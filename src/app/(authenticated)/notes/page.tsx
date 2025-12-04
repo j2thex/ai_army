@@ -1,6 +1,8 @@
 import { createClient } from '@/utils/supabase/server'
 import NotesTable from '@/components/NotesTable'
 
+export const dynamic = 'force-dynamic'
+
 export default async function NotesPage() {
     const supabase = await createClient()
 
