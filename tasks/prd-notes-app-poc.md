@@ -2,14 +2,15 @@
 
 ## Introduction/Overview
 
-The AI Army Notes App POC is the first public-facing deployment of the AI Army project. This application combines a compelling landing page with a functional notes application to demonstrate the power of AI-assisted development. The landing page introduces visitors to our vision, while the notes app provides a working demonstration of what AI collaboration can build.
+The AI Army Notes App POC is the first public-facing deployment of the AI Army project. This application combines a compelling landing page with a **collaborative multi-user notes application** to demonstrate the power of AI-assisted development. The landing page introduces visitors to our vision, while the notes app provides a working demonstration of what AI collaboration can build - a real-time collaborative platform where multiple users can create, view, edit, and organize notes together.
 
 **Problem it solves:** 
 1. We need a public presence to attract collaborators and share our vision
 2. We need a tangible demonstration of AI-assisted development capabilities
 3. We need to show that AI can help build real, functional applications quickly
+4. We need to demonstrate collaborative features that align with our "AI Army" collaborative philosophy
 
-**Goal:** Create a compelling landing page paired with a fully functional notes application (with authentication, CRUD operations, tags, and search) that showcases the AI Army concept and demonstrates our ability to rapidly build quality software.
+**Goal:** Create a compelling landing page paired with a fully collaborative notes application (with multi-user access, authentication, full CRUD operations, tags, and search) that showcases the AI Army concept and demonstrates our ability to rapidly build quality collaborative software.
 
 ## Goals
 
@@ -32,21 +33,25 @@ The AI Army Notes App POC is the first public-facing deployment of the AI Army p
 
 ### Notes App Stories
 
-4. **As a user**, I want to log in with a simple demo account, so I can access the notes application without complex authentication.
+4. **As a user**, I want to log in with a simple demo account, so I can access the collaborative notes application without complex authentication.
 
-5. **As a user**, I want to create new notes with text content, so I can capture my thoughts and ideas.
+5. **As a user**, I want to create new notes with text content, so I can share my thoughts and ideas with other users.
 
-6. **As a user**, I want to view all my notes in a list, so I can see what I've created.
+6. **As a user**, I want to view all notes from all users, so I can see what the community is creating and collaborating on.
 
-7. **As a user**, I want to edit existing notes, so I can update or refine my content.
+7. **As a user**, I want to see who created each note, so I can know which user contributed what content.
 
-8. **As a user**, I want to delete notes I no longer need, so I can keep my workspace clean.
+8. **As a user**, I want to filter between "My Notes" and "All Notes", so I can focus on my own content or explore everyone's contributions.
 
-9. **As a user**, I want to add tags to my notes, so I can organize and categorize them.
+9. **As a user**, I want to edit any note (including notes created by others), so I can contribute to collaborative content and fix errors.
 
-10. **As a user**, I want to search through my notes, so I can quickly find specific content.
+10. **As a user**, I want to delete any note (including notes created by others), so I can help maintain the quality of shared content.
 
-11. **As a user**, I want to filter notes by tags, so I can view related notes together.
+11. **As a user**, I want to add tags to notes, so I can organize and categorize shared content.
+
+12. **As a user**, I want to search through all notes, so I can quickly find specific content across all users' contributions.
+
+13. **As a user**, I want to filter notes by tags, so I can view related notes together across all users.
 
 ## Functional Requirements
 
@@ -88,12 +93,15 @@ The AI Army Notes App POC is the first public-facing deployment of the AI Army p
    - Automatic account creation if username doesn't exist
    - Session persistence (user stays logged in)
    - Logout functionality
+   - Display current logged-in username in the app header/navbar
 
 8. **Access Control**: The app must:
    - Show landing page to all visitors
    - Require login to access notes app
    - Redirect unauthenticated users to login
-   - Show user's own notes only (data isolation by user)
+   - Show ALL users' notes to authenticated users (collaborative model)
+   - Track and display the author (creator) of each note
+   - Allow any authenticated user to view, edit, and delete any note
 
 ### Notes App - Core CRUD Requirements
 
@@ -102,24 +110,26 @@ The AI Army Notes App POC is the first public-facing deployment of the AI Army p
    - Enter note title (required)
    - Enter note content/body (text format, required)
    - Add tags (optional, multiple tags allowed)
-   - Save the note to Supabase
-   - See the new note appear in the notes list immediately
+   - Save the note to Supabase with the current user as the author
+   - See the new note appear in the notes list immediately with author name displayed
 
 10. **Read/View Notes**: The app must allow users to:
-    - View a list of all their notes
-    - See note title, preview of content, tags, and creation date
+    - View a list of ALL notes from ALL users by default
+    - See note title, preview of content, author username, tags, and creation date on each note
     - Click on a note to view full details
     - See notes sorted by most recent first (default)
+    - Filter view to show "My Notes" (created by current user) or "All Notes"
 
 11. **Update Notes**: The app must allow users to:
-    - Click an "Edit" button on any note
+    - Click an "Edit" button on ANY note (including notes created by other users)
     - Modify the title, content, and tags
-    - Save changes to Supabase
+    - Save changes to Supabase (preserving original author)
     - See updated note reflected immediately
+    - Optionally track "last edited by" information
 
 12. **Delete Notes**: The app must allow users to:
-    - Click a "Delete" button on any note
-    - Confirm deletion (simple confirmation dialog)
+    - Click a "Delete" button on ANY note (including notes created by other users)
+    - Confirm deletion (simple confirmation dialog showing note title and author)
     - Remove note from Supabase
     - See note removed from list immediately
 
@@ -141,15 +151,17 @@ The AI Army Notes App POC is the first public-facing deployment of the AI Army p
 
 15. **Search Functionality**: The app must allow users to:
     - Enter search text in a search input field
-    - Search across note titles and content
+    - Search across ALL notes' titles and content (from all users)
     - See results update in real-time as they type
     - Clear search to return to full notes list
     - See search term highlighted or indicated
+    - Search results should respect the "My Notes" vs "All Notes" filter
 
 16. **Combined Filtering**: The app must support:
-    - Using search and tag filter together
-    - Clear indication of active filters
+    - Using search, tag filter, and user filter ("My Notes"/"All Notes") together
+    - Clear indication of active filters (search term, selected tags, user filter)
     - Easy way to clear all filters
+    - Filter combinations should work intuitively (e.g., search within my notes only)
 
 ### Design Requirements
 
@@ -174,16 +186,20 @@ The AI Army Notes App POC is the first public-facing deployment of the AI Army p
 20. **Notes App UI**: The notes app must have:
     - Clean, intuitive interface
     - Clear navigation between notes list and note detail/edit views
-    - Visible search bar and tag filter controls
+    - Visible search bar, tag filter controls, and user filter toggle ("My Notes"/"All Notes")
     - Responsive layout for notes list (grid or list view)
+    - Clear display of author username on each note card
+    - Visual indication of which notes are created by the current user vs others
+    - Header/navbar showing current logged-in user and logout button
 
 ### Technical Requirements
 
 21. **Database Schema**: Supabase database must include:
     - `users` table: id, username, created_at
-    - `notes` table: id, user_id, title, content, tags (array), created_at, updated_at
+    - `notes` table: id, user_id (author), title, content, tags (array), created_at, updated_at, last_edited_by (optional)
     - Proper foreign key relationships
-    - Row Level Security (RLS) policies to ensure users only see their own notes
+    - Row Level Security (RLS) policies that allow authenticated users to read, create, update, and delete ALL notes
+    - Author tracking via user_id foreign key to identify note creator
 
 22. **API Integration**: The app must:
     - Use Supabase client for all database operations
@@ -223,7 +239,7 @@ The following are explicitly **NOT** included in this POC:
 1. **Real authentication/security** - Simple demo auth only, no passwords, no OAuth
 2. **Rich text editing** - Plain text only for notes content
 3. **File attachments** - Text notes only
-4. **Sharing/collaboration** - Notes are private to each user
+4. **Advanced permissions** - No granular permissions, all users can edit all notes
 5. **Note folders/organization** - Tags only for organization
 6. **Export functionality** - No export to PDF, markdown, etc.
 7. **Mobile apps** - Web app only
@@ -245,11 +261,13 @@ The following are explicitly **NOT** included in this POC:
 - **Icons**: Use simple SVG icons for actions (edit, delete, add, search)
 
 ### UI/UX Guidelines
-- **Landing Page**: Above the fold hero should immediately communicate value and CTA
-- **Notes App**: Intuitive, familiar note-taking interface (inspired by apps like Notion, Apple Notes)
+- **Landing Page**: Above the fold hero should immediately communicate value and collaborative nature
+- **Notes App**: Intuitive, collaborative interface (inspired by apps like Notion, Google Docs)
+- **Collaboration Indicators**: Clear visual indicators showing note authors and collaborative features
 - **Navigation**: Clear transition from landing page to notes app
 - **Feedback**: Immediate visual feedback for all user actions
 - **Empty States**: Helpful messages when no notes exist or no search results
+- **User Context**: Always show current user and make it easy to filter "My Notes" vs "All Notes"
 
 ## Technical Considerations
 
@@ -339,32 +357,45 @@ CREATE TABLE users (
 -- Notes table
 CREATE TABLE notes (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE, -- Original author
   title TEXT NOT NULL,
   content TEXT NOT NULL,
   tags TEXT[] DEFAULT '{}',
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  last_edited_by UUID REFERENCES users(id) -- Optional: track last editor
 );
 
--- RLS Policies
+-- RLS Policies (Collaborative Access)
 ALTER TABLE notes ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Users can view their own notes"
+-- Any authenticated user can view all notes
+CREATE POLICY "Authenticated users can view all notes"
   ON notes FOR SELECT
-  USING (auth.uid() = user_id);
+  TO authenticated
+  USING (true);
 
-CREATE POLICY "Users can create their own notes"
+-- Any authenticated user can create notes
+CREATE POLICY "Authenticated users can create notes"
   ON notes FOR INSERT
-  WITH CHECK (auth.uid() = user_id);
+  TO authenticated
+  WITH CHECK (true);
 
-CREATE POLICY "Users can update their own notes"
+-- Any authenticated user can update any note
+CREATE POLICY "Authenticated users can update all notes"
   ON notes FOR UPDATE
-  USING (auth.uid() = user_id);
+  TO authenticated
+  USING (true);
 
-CREATE POLICY "Users can delete their own notes"
+-- Any authenticated user can delete any note
+CREATE POLICY "Authenticated users can delete all notes"
   ON notes FOR DELETE
-  USING (auth.uid() = user_id);
+  TO authenticated
+  USING (true);
+
+-- Index for better performance
+CREATE INDEX idx_notes_user_id ON notes(user_id);
+CREATE INDEX idx_notes_created_at ON notes(created_at DESC);
 ```
 
 ## Success Metrics
